@@ -2,7 +2,7 @@
   "name": "login-register-rest-api",
   "version": "1.0.0",
   "description": "Membuat login dan register page dengan RESTful API",
-  "main": "src/app.js",
+  "main": "src/main.js",
   "type": "module",
   "scripts": {
     "test": "jest -i6"
