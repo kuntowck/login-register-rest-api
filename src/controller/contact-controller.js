@@ -3,7 +3,6 @@ import contactService from "../service/contact-service";
 const create = async (req, res, next) => {
   try {
     const user = req.user;
-    console.log(user);
     const request = req.body;
     const result = await contactService.create(user, request);
     res.status(200).json({
@@ -14,4 +13,17 @@ const create = async (req, res, next) => {
   }
 };
 
-export default { create };
+const get = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const contactId = req.params.contactId;
+    const result = await contactService.get(user, contactId);
+    res.status(200).json({
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, get, update };
