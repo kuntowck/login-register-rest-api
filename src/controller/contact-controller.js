@@ -1,3 +1,4 @@
+import { prismaClient } from "../app/database";
 import contactService from "../service/contact-service";
 
 const create = async (req, res, next) => {
@@ -38,9 +39,24 @@ const update = async (req, res, next) => {
       data: result,
     });
   } catch (error) {
-    console.log("Error in controller update: ", error);
     next(error);
+    console.log("Error in controller update: ", error);
   }
 };
 
-export default { create, get, update };
+const remove = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const contactId = req.params.contactId;
+
+    await contactService.remove(user, contactId);
+    res.status(200).json({
+      data: "OK",
+    });
+  } catch (error) {
+    next(error);
+    console.log("Error in controller remove: ", error);
+  }
+};
+
+export default { create, get, update, remove };
