@@ -48,6 +48,20 @@ const createTestContact = async () => {
   });
 };
 
+const createManyTestContact = async () => {
+  for (let i = 0; i < 15; i++) {
+    await prismaClient.contact.create({
+      data: {
+        username: `test`,
+        firstName: `test ${i}`,
+        lastName: `test ${i}`,
+        email: `test${i}@gmail.com`,
+        phone: `0812345678${i}`,
+      },
+    });
+  }
+};
+
 const getTestContact = async () => {
   return prismaClient.contact.findFirst({
     where: {
@@ -59,6 +73,7 @@ const getTestContact = async () => {
 export {
   removeTestUser,
   createTestUser,
+  createManyTestContact,
   getTestUser,
   removeAllTestContacts,
   createTestContact,

@@ -1,5 +1,7 @@
 import { prismaClient } from "../app/database";
+import { logger } from "../app/logging";
 import contactService from "../service/contact-service";
+import userService from "../service/user-service";
 
 const create = async (req, res, next) => {
   try {
@@ -40,7 +42,6 @@ const update = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    console.log("Error in controller update: ", error);
   }
 };
 
@@ -55,8 +56,29 @@ const remove = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    console.log("Error in controller remove: ", error);
   }
 };
 
-export default { create, get, update, remove };
+const search = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const request = {
+      name: req.query.name,
+      email: req.query.email,
+      phone: req.query.phone,
+      page: req.query.page,
+      size: req.query.size,
+    };
+
+    const result = await contactService.search(user, request);
+    logger.info(result);
+    res.status(200).json({
+      data: result.data,
+      paging: result.paging,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default { create, get, update, remove, search };

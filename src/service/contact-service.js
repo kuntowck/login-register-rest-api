@@ -1,6 +1,7 @@
 import {
   createContactValidation,
   getContactValidation,
+  searchContactValidation,
   updateContactValidation,
 } from "../validation/contact-validation";
 import { validate } from "../validation/validaton.js";
@@ -101,9 +102,75 @@ const remove = async (user, contactId) => {
   });
 };
 
+const search = async (user, request) => {
+  request = validate(searchContactValidation, request);
+
+  // skip = (page - 1) * size
+  // 1. (1 - 1) * 10 = 0
+  // 2. (2 - 1) * 10 = 10
+  const skip = (request.page - 1) * request.size;
+
+  const filters = [];
+  filters.push({ username: user.username });
+  if (request.name) {
+    filters.push({
+      OR: [
+        {
+          firstName: {
+            contains: request.name,
+          },
+        },
+        {
+          lastName: {
+            contains: request.name,
+          },
+        },
+      ],
+    });
+  }
+  if (request.email) {
+    filters.push({
+      email: {
+        contains: request.email,
+      },
+    });
+  }
+  if (request.phone) {
+    filters.push({
+      phone: {
+        contains: request.phone,
+      },
+    });
+  }
+
+  const contacts = await prismaClient.contact.findMany({
+    where: {
+      AND: filters,
+    },
+    take: request.size,
+    skip,
+  });
+
+  const totalItems = await prismaClient.contact.count({
+    where: {
+      AND: filters,
+    },
+  });
+
+  return {
+    data: contacts,
+    paging: {
+      page: request.page,
+      totalItems,
+      totalPage: Math.ceil(totalItems / request.size),
+    },
+  };
+};
+
 export default {
   create,
   get,
   update,
   remove,
+  search,
 };
